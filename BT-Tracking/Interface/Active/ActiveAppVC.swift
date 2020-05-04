@@ -57,6 +57,13 @@ final class ActiveAppVC: UIViewController {
 
         layoutCardView()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        updateInterface()
+        layoutCardView()
+    }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -134,8 +141,7 @@ final class ActiveAppVC: UIViewController {
         }))
         #endif
         controller.addAction(UIAlertAction(title: Localizable(viewModel.menuAbout), style: .default, handler: { [weak self] _ in
-            guard let url = URL(string: RemoteValues.aboutLink) else { return }
-            self?.openURL(URL: url)
+            self?.aboutAction()
         }))
         controller.addAction(UIAlertAction(title: Localizable(viewModel.menuCancel), style: .cancel))
         controller.popoverPresentationController?.barButtonItem = sender as? UIBarButtonItem
@@ -153,12 +159,17 @@ final class ActiveAppVC: UIViewController {
         present(controller, animated: true)
     }
 
+    private func aboutAction() {
+        let storyboard = UIStoryboard(name: "Help", bundle: nil)
+        let controller = storyboard.instantiateViewController(withIdentifier: "About")
+        navigationController?.pushViewController(controller, animated: true)
+    }
+
     // MARK: -
     
     @objc private func applicationDidBecomeActive() {
         checkForBluetooth()
     }
-
 }
 
 private extension ActiveAppVC {
@@ -188,7 +199,7 @@ private extension ActiveAppVC {
         imageView.image = viewModel.state.image
         headlineLabel.localizedText(viewModel.state.headline)
         headlineLabel.textColor = viewModel.state.color
-        titleLabel.localizedText(viewModel.state.title)
+        titleLabel.text = viewModel.state.title
         tipsLabel.localizedText(viewModel.tips)
         firstTipLabel.localizedText(viewModel.firstTip)
         secondTipLabel.localizedText(viewModel.secondTip)
@@ -278,5 +289,4 @@ private extension ActiveAppVC {
         guard let URL = url else { return }
         UIApplication.shared.open(URL)
     }
-
 }
